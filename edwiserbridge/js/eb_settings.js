@@ -158,10 +158,10 @@ define('local_edwiserbridge/eb_settings', ['jquery', 'core/ajax', 'core/url', 'c
             /*********** END *********/
             // Add Settings field.
             if (!$('.eb_settings_btn_cont').length) {
-                $("#admin-eb_test_field").before('<div class="eb_settings_btn_cont" style="padding: 30px;"> ' + M.util.get_string('eb_settings_msg', 'local_edwiserbridge') + ' <a target="_blank" style="border-radius: 4px;margin-left: 5px;padding: 7px 18px;" class="eb_settings_btn btn btn-primary" href="' + M.cfg.wwwroot + '/local/edwiserbridge/edwiserbridge.php?tab=service"> ' + M.util.get_string('click_here', 'local_edwiserbridge') + ' </a></div>');
+                $("#admin-eb_setup_wizard_field").before('<div class="eb_settings_btn_cont" style="padding: 30px;"> ' + M.util.get_string('eb_settings_msg', 'local_edwiserbridge') + ' <a target="_blank" style="border-radius: 4px;margin-left: 5px;padding: 7px 18px;" class="eb_settings_btn btn btn-primary" href="' + M.cfg.wwwroot + '/local/edwiserbridge/edwiserbridge.php?tab=service"> ' + M.util.get_string('click_here', 'local_edwiserbridge') + ' </a></div>');
             }
             // $('#admin-ebexistingserviceselect').css('display', 'none');
-            $('#admin-eb_test_field').css('display', 'none');
+            $('#admin-eb_setup_wizard_field').css('display', 'none');
 
 
 
@@ -196,38 +196,24 @@ define('local_edwiserbridge/eb_settings', ['jquery', 'core/ajax', 'core/url', 'c
                 event.preventDefault();
 
                 var error = 0;
-
                 var web_service_name = $('#id_eb_service_inp').val();
                 var user_id = $('#id_eb_auth_users_list').val();
-
                 var service_id = $('#id_eb_sevice_list').val();
                 var token = $('#id_eb_token').val();
 
                 $('.eb_settings_err').remove();
-                // $('#eb_common_err').text('');
-                // $('#eb_common_success').text('');
-
                 $('#eb_common_success').css('display', 'none');
                 $('#eb_common_err').css('display', 'none');
 
                 if (user_id == "") {
-                    // $('#id_eb_auth_users_list').after('<span class="eb_settings_err">'+ M.util.get_string('eb_empty_user_err', 'local_edwiserbridge') +'</span>');
-
                     $('#eb_common_err').text(M.util.get_string('eb_empty_user_err', 'local_edwiserbridge'));
-
                     $('#eb_common_err').css('display', 'block');
-
-
                     error = 1;
                 }
 
 
-
-
-
                 //If the select box has a value to create the web service the create web service else
                 if (service_id == 'create') {
-
                     if (web_service_name == "") {
                         $('#eb_common_err').css('display', 'block');
 
@@ -236,16 +222,12 @@ define('local_edwiserbridge/eb_settings', ['jquery', 'core/ajax', 'core/url', 'c
                         error = 1;
                     }
 
-
-
                     if (error) {
                         return;
                     }
 
                     create_web_service(web_service_name, user_id, '#id_eb_sevice_list', '#eb_common_err', 1);
                 } else {
-
-
                     if ($('#id_eb_token').val() == '') {
 
                         $('#eb_common_err').css('display', 'block');
@@ -271,11 +253,6 @@ define('local_edwiserbridge/eb_settings', ['jquery', 'core/ajax', 'core/url', 'c
             }); // event end
 
             /************************ Web service creation click handlers *******************************/
-
-
-
-
-
 
 
 
@@ -359,13 +336,7 @@ define('local_edwiserbridge/eb_settings', ['jquery', 'core/ajax', 'core/url', 'c
             });
 
 
-
-
-
             /*************   Copy to clipboard functionality handler  **************/
-
-
-
 
             /*----------------------------------------------------
              * Below are alll js functions
@@ -563,11 +534,7 @@ define('local_edwiserbridge/eb_settings', ['jquery', 'core/ajax', 'core/url', 'c
 
             }
 
-
-
             /************************  FUnctions END  ****************************/
-
-
             // });
 
         });

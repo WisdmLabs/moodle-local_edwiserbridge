@@ -15,13 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * virtual classroom functions and service definitions.
- * used in ajax call
+ * Edwiser Bridge - WordPress and Moodle integration..
+ * File used to register all the services we are adding externally.
  *
  * @package    local_edwiserbridge
  * @copyright 2019, Wisdmlabs <support@wisdmlabs.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 $functions = array(
     'eb_test_connection' => array(

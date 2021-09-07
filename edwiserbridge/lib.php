@@ -1,99 +1,107 @@
 <?php
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * Edwiser Bridge - WordPress and Moodle integration.
+ * File contains all required
+ *
+ * @package local_edwiserbridge
+ * @copyright  2016 Wisdmlabs
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+defined('MOODLE_INTERNAL') || die();
 
 require_once(dirname(__FILE__)."/classes/class-api-handler.php");
 require_once(dirname(__FILE__)."/classes/class-settings-handler.php");
 require_once("{$CFG->libdir}/completionlib.php");
 
 
-function local_edwiserbridge_extend_settings_navigation($settingsnav, $context)
-{
+function local_edwiserbridge_extend_settings_navigation($settingsnav, $context) {
 
 }
 
 
 /**
  * [save_connection_form_settings description]
- * @param  [type] $form_data [description]
- * @return [type]            [description]
+ * @param object $formdata formdata
  */
-function save_connection_form_settings($form_data)
-{
-    if (count($form_data->wp_url) != count($form_data->wp_token)) {
+function save_connection_form_settings($formdata) {
+    if (count($formdata->wp_url) != count($formdata->wp_token)) {
         return;
     }
 
-    $connection_settings = array();
-    for ($i=0; $i<count($form_data->wp_url); $i++) {
-        if (!empty($form_data->wp_url[$i]) && !empty($form_data->wp_token[$i]) && !empty($form_data->wp_name[$i])) {
-            $connection_settings[$form_data->wp_name[$i]] = array(
-                "wp_url" => $form_data->wp_url[$i],
-                "wp_token" => $form_data->wp_token[$i],
-                "wp_name" => $form_data->wp_name[$i]
+    $connectionsettings = array();
+    for ($i = 0; $i < count($formdata->wp_url); $i++) {
+        if (!empty($formdata->wp_url[$i]) && !empty($formdata->wp_token[$i]) && !empty($formdata->wp_name[$i])) {
+            $connectionsettings[$formdata->wp_name[$i]] = array(
+                "wp_url"   => $formdata->wp_url[$i],
+                "wp_token" => $formdata->wp_token[$i],
+                "wp_name"  => $formdata->wp_name[$i]
             );
         }
     }
-    set_config("eb_connection_settings", serialize($connection_settings));
+    set_config("eb_connection_settings", serialize($connectionsettings));
 }
 
 /**
  * Save the synch settings for the individual site
  */
-function save_synchronization_form_settings($form_data)
-{
+function save_synchronization_form_settings($formdata) {
     global $CFG;
-    $synch_settings = array();
-    $connection_settings = unserialize($CFG->eb_connection_settings);
-    $connection_settings_keys = array_keys($connection_settings);
+    $synchsettings          = array();
+    $connectionsettings     = unserialize($CFG->eb_connection_settings);
+    $connectionsettingskeys = array_keys($connectionsettings);
 
+    if (in_array($formdata->wp_site_list, $connectionsettingskeys)) {
+        $existingsynchsettings = isset($CFG->eb_synch_settings) ? unserialize($CFG->eb_synch_settings) : array();
+        $synchsettings         = $existingsynchsettings;
 
-    if (in_array($form_data->wp_site_list, $connection_settings_keys)) {
-        $existing_synch_settings = isset($CFG->eb_synch_settings) ? unserialize($CFG->eb_synch_settings) : array();
-        $synch_settings = $existing_synch_settings;
-        $synch_settings[$form_data->wp_site_list] = array(
-        // "course_enrollment"    => $form_data->wp_site_list,
-        "course_enrollment"    => $form_data->course_enrollment,
-        "course_un_enrollment" => $form_data->course_un_enrollment,
-        "user_creation"        => $form_data->user_creation,
-        "user_deletion"        => $form_data->user_deletion,
-        "course_deletion"      => $form_data->course_deletion,
-        "user_updation"        => $form_data->user_updation
+        $synchsettings[$formdata->wp_site_list] = array(
+            "course_enrollment"    => $formdata->course_enrollment,
+            "course_un_enrollment" => $formdata->course_un_enrollment,
+            "user_creation"        => $formdata->user_creation,
+            "user_deletion"        => $formdata->user_deletion,
+            "course_creation"      => $formdata->course_creation,
+            "course_deletion"      => $formdata->course_deletion,
+            "user_updation"        => $formdata->user_updation
         );
-    } else {
-        $synch_settings[$form_data->wp_site_list] = array(
-            // "course_enrollment"    => $form_data->wp_site_list,
-            "course_enrollment"    => $form_data->course_enrollment,
-            "course_un_enrollment" => $form_data->course_un_enrollment,
-            "user_creation"        => $form_data->user_creation,
-            "user_deletion"        => $form_data->user_deletion,
-            "course_deletion"      => $form_data->course_deletion,
-            "user_updation"        => $form_data->user_updation
-        );
+
     }
-    set_config("eb_synch_settings", serialize($synch_settings));
+    set_config("eb_synch_settings", serialize($synchsettings));
 }
 
 
 
-function save_settings_form_settings($form_data)
-{
-    // echo $CFG->extendedusernamechars;
+function save_settings_form_settings($formdata) {
+    global $CFG;
 
-    if (isset($form_data->web_service) && isset($form_data->pass_policy) && isset($form_data->extended_username)) {
+    if (isset($formdata->web_service) && isset($formdata->pass_policy) && isset($formdata->extended_username)) {
 
-        $active_webservices = empty($CFG->webserviceprotocols) ? array() : explode(',', $CFG->webserviceprotocols);
+        $activewebservices = empty($CFG->webserviceprotocols) ? array() : explode(',', $CFG->webserviceprotocols);
 
-        if ($form_data->rest_protocol) {
-            $active_webservices[] = 'rest';
+        if ($formdata->rest_protocol) {
+            $activewebservices[] = 'rest';
         } else {
-            $key = array_search('rest', $active_webservices);
-            unset($active_webservices[$key]);
+            $key = array_search('rest', $activewebservices);
+            unset($activewebservices[$key]);
         }
 
-
-        set_config('webserviceprotocols', implode(',', $active_webservices));
-        set_config("enablewebservices", $form_data->web_service);
-        set_config("extendedusernamechars", $form_data->extended_username);
-        set_config("passwordpolicy", $form_data->pass_policy);
+        set_config('webserviceprotocols', implode(',', $activewebservices));
+        set_config("enablewebservices", $formdata->web_service);
+        set_config("extendedusernamechars", $formdata->extended_username);
+        set_config("passwordpolicy", $formdata->pass_policy);
 
     }
 
@@ -101,29 +109,23 @@ function save_settings_form_settings($form_data)
 
 
 
-function get_required_settings()
-{
-    // echo $CFG->extendedusernamechars;
+function get_required_settings() {
     global $CFG;
 
-    $required_settings = array();
+    $requiredsettings = array();
 
-    $active_webservices = empty($CFG->webserviceprotocols) ? array() : explode(',', $CFG->webserviceprotocols);
-    
-    // $start_zero = array_values($active_webservices);
+    $activewebservices = empty($CFG->webserviceprotocols) ? array() : explode(',', $CFG->webserviceprotocols);
 
-    $required_settings['rest_protocol'] = 0;
-    if (false !== array_search('rest', $active_webservices)) {
-        $required_settings['rest_protocol'] = 1;
+    $requiredsettings['rest_protocol'] = 0;
+    if (false !== array_search('rest', $activewebservices)) {
+        $requiredsettings['rest_protocol'] = 1;
     }
 
+    $requiredsettings['web_service'] = isset($CFG->enablewebservices) ? $CFG->enablewebservices : false;
+    $requiredsettings['extended_username'] = isset($CFG->extendedusernamechars) ? $CFG->extendedusernamechars : false;
+    $requiredsettings['pass_policy'] = isset($CFG->passwordpolicy) ? $CFG->passwordpolicy : false;
 
-
-    $required_settings['web_service'] = isset($CFG->enablewebservices) ? $CFG->enablewebservices : false;
-    $required_settings['extended_username'] = isset($CFG->extendedusernamechars) ? $CFG->extendedusernamechars : false;
-    $required_settings['pass_policy'] = isset($CFG->passwordpolicy) ? $CFG->passwordpolicy : false;
-
-    return $required_settings;
+    return $requiredsettings;
 }
 
 
@@ -131,8 +133,7 @@ function get_required_settings()
 /**
  * returns connection settings saved in the settings form.
  */
-function get_connection_settings()
-{
+function get_connection_settings() {
     global $CFG;
     $reponse["eb_connection_settings"] = isset($CFG->eb_connection_settings) ? unserialize($CFG->eb_connection_settings) : false;
     return $reponse;
@@ -144,8 +145,7 @@ function get_connection_settings()
  * @param  [type] $index [description]
  * @return [type]        [description]
  */
-function get_synch_settings($index)
-{
+function get_synch_settings($index) {
     global $CFG;
     $reponse = isset($CFG->eb_synch_settings) ? unserialize($CFG->eb_synch_settings) : false;
 
@@ -155,6 +155,7 @@ function get_synch_settings($index)
         "course_un_enrollment" => 0,
         "user_creation"        => 0,
         "user_deletion"        => 0,
+        "course_creation"      => 0,
         "course_deletion"      => 0,
         "user_updation"        => 0,
     );
@@ -168,20 +169,18 @@ function get_synch_settings($index)
 
 /**
  * returns all the sites created in the edwiser settings.
- * @return [type] [description]
+ * @return array sites list
  */
-function get_site_list()
-{
+function get_site_list() {
     global $CFG;
     $reponse = isset($CFG->eb_connection_settings) ? unserialize($CFG->eb_connection_settings) : false;
 
-    $sites = array();
     if ($reponse && count($reponse)) {
         foreach ($reponse as $key => $value) {
             $sites[$key] = $value["wp_name"];
         }
     } else {
-        return array("" => "--- No Sites Available ---");
+        $sites = array("" => get_string('eb_no_sites', 'local_edwiserbridge'));
     }
     return $sites;
 }
@@ -195,45 +194,46 @@ function get_site_list()
  *
  * @return EDW
  */
-function api_handler_instance()
-{
+function api_handler_instance() {
     return api_handler::instance();
 }
 
 
 /**
  * returns the list of courses in which user is enrolled
- * @return [type]          [description]
+ *
+ * @return int $userid user id.
+ * @return array array of courses.
  */
-function get_array_of_enrolled_courses($user_id)
-{
-    $enrolled_courses = enrol_get_users_courses($user_id);
-    $courses = array();
+function get_array_of_enrolled_courses($userid) {
+    $enrolledcourses = enrol_get_users_courses($userid);
+    $courses         = array();
 
-    foreach ($enrolled_courses as $value) {
+    foreach ($enrolledcourses as $value) {
         array_push($courses, $value->id);
     }
     return $courses;
 }
 
 /**
- * removes processed coureses from the course whose progress is already provided.
- * @return [type]            [description]
+ * Removes processed coureses from the course whose progress is already provided.
+ *
+ * @param int $courseid course id.
+ * @param array $courses courses array.
+ * @return array courses array.
  */
-function remove_processed_coures($course_id, $courses)
-{
-    if (($key = array_search($course_id, $courses)) !== false) {
+function remove_processed_coures($courseid, $courses) {
+    $key = array_search($courseid, $courses);
+    if ($key !== false) {
         unset($courses[$key]);
     }
     return $courses;
 }
 
 /**
- * functionality to check if the request is from wordpress and the stop processing the enrollment and unenrollment.
- * @return
+ * Functionality to check if the request is from wordpress and the stop processing the enrollment and unenrollment.
  */
-function check_if_request_is_from_wp()
-{
+function check_if_request_is_from_wp() {
     if (isset($_POST) && isset($_POST["enrolments"])) {
         return 1;
     }
@@ -241,148 +241,149 @@ function check_if_request_is_from_wp()
 }
 
 
-
-
-
-
 /*-----------------------------------------------------------
- *   Functions used in Settings page  
+ *   Functions used in Settings page
  *----------------------------------------------------------*/
-
-
-function eb_get_administrators()
-{
-
-    $admins = get_admins(); 
-    $settings_arr['']       = get_string('new_serivce_user_lbl', 'local_edwiserbridge');
+/**
+ * Functionality to get all available Moodle sites administrator.
+ */
+function eb_get_administrators() {
+    $admins          = get_admins();
+    $settingsarr      = array();
+    $settingsarr[''] = get_string('new_serivce_user_lbl', 'local_edwiserbridge');
 
     foreach ($admins as $value) {
-        $settings_arr[$value->id] = $value->email;
+        $settingsarr[$value->id] = $value->email;
     }
-    return $settings_arr;
+    return $settingsarr;
 }
 
-
-
-
-function eb_get_existing_services()
-{
-    global $DB, $CFG;
-    $result = $DB->get_records("external_services", null, '','id, name');
-    $settings_arr[''] = get_string('existing_serice_lbl', 'local_edwiserbridge');
-    $settings_arr['create'] = ' - ' . get_string('new_web_new_service', 'local_edwiserbridge') . ' - ';
-
+/**
+ * Functionality to get all available Moodle sites services.
+ */
+function eb_get_existing_services() {
+    global $DB;
+    $settingsarr           = array();
+    $result                = $DB->get_records("external_services", null, '', 'id, name');
+    $settingsarr['']       = get_string('existing_serice_lbl', 'local_edwiserbridge');
+    $settingsarr['create'] = ' - ' . get_string('new_web_new_service', 'local_edwiserbridge') . ' - ';
 
     foreach ($result as $value) {
-        $settings_arr[$value->id] = $value->name;
+        $settingsarr[$value->id] = $value->name;
     }
 
-    return $settings_arr;
+    return $settingsarr;
 }
 
+/**
+ * Functionality to get all available Moodle sites tokens.
+ *
+ * @param int $serviceid service id.
+ * @return array settings array.
+ */
+function eb_get_service_tokens($serviceid) {
+    global $DB;
 
-
-
-
-function eb_get_service_tokens($service_id)
-{
-    global $DB, $CFG;
-
-    $result = $DB->get_records("external_tokens", null, '','token, externalserviceid');
+    $settingsarr = array();
+    $result      = $DB->get_records("external_tokens", null, '', 'token, externalserviceid');
 
     foreach ($result as $value) {
-        $settings_arr[] = array('token' => $value->token, 'id' => $value->externalserviceid);
+        $settingsarr[] = array('token' => $value->token, 'id' => $value->externalserviceid);
     }
 
-    return $settings_arr;
+    return $settingsarr;
 }
 
+/**
+ * Functionality to create token.
+ *
+ * @param int $serviceid service id.
+ * @param int $existingtoken existing token.
+ * @return string html content.
+ */
+function eb_create_token_field($serviceid, $existingtoken = '') {
 
-
-
-function eb_create_token_field($service_id, $existing_token = '')
-{
-
-    $tokens_list = eb_get_service_tokens($service_id);
+    $tokenslist = eb_get_service_tokens($serviceid);
 
     $html = '<div class="eb_copy_txt_wrap">
                 <div style="width:60%;">
                     <select class="eb_copy" class="custom-select" name="eb_token" id="id_eb_token">
                     <option value="">'. get_string('token_dropdown_lbl', 'local_edwiserbridge') .'</option>';
 
-    foreach ($tokens_list as $token) {
+    foreach ($tokenslist as $token) {
         $selected = '';
         $display = '';
 
-        if(isset($token['token']) && $token['token'] == $existing_token) {
-            $selected = " selected"; 
+        if (isset($token['token']) && $token['token'] == $existingtoken) {
+            $selected = " selected";
         }
 
-        if(isset($token['id']) && $token['id'] != $service_id) {
-            $display = 'style="display:none"'; 
+        if (isset($token['id']) && $token['id'] != $serviceid) {
+            $display = 'style="display:none"';
         }
 
-
-        $html .= '<option data-id="'. $token['id'] .'" value="'. $token['token'] .'" '. $display ." " . $selected.'>'. $token['token'] .'</option>';
+        $html .= '<option data-id="'. $token['id'] .'" value="'. $token['token'] .'" '
+        . $display ." " . $selected.'>'. $token['token'] .'</option>';
     }
-
 
     $html .= '      </select>
                 </div>
-                <div> <button class="btn btn-primary eb_primary_copy_btn">'. get_string('copy', 'local_edwiserbridge') .'</button> </div>
+                <div> <button class="btn btn-primary eb_primary_copy_btn">'. get_string('copy', 'local_edwiserbridge')
+                .'</button> </div>
             </div>';
 
     return $html;
 }
 
 
-
-
-
-
-
-
-function eb_get_service_info($service_id)
-{
+/**
+ * Functionality to get count of not available services which are required for Edwiser-Bridge.
+ *
+ * @param int $serviceid service id.
+ * @return string count of not available services.
+ */
+function eb_get_service_info($serviceid) {
     global $DB;
     $functions = array(
-        array('externalserviceid' => $service_id, 'functionname' => 'core_user_create_users'),
-        array('externalserviceid' => $service_id, 'functionname' => 'core_user_get_users_by_field'),
-        array('externalserviceid' => $service_id, 'functionname' => 'core_user_update_users'),
-        array('externalserviceid' => $service_id, 'functionname' => 'core_course_get_courses'),
-        array('externalserviceid' => $service_id, 'functionname' => 'core_course_get_categories'),
-        array('externalserviceid' => $service_id, 'functionname' => 'enrol_manual_enrol_users'),
-        array('externalserviceid' => $service_id, 'functionname' => 'enrol_manual_unenrol_users'),
-        array('externalserviceid' => $service_id, 'functionname' => 'core_enrol_get_users_courses'),
-        array('externalserviceid' => $service_id, 'functionname' => 'eb_test_connection'),
-        array('externalserviceid' => $service_id, 'functionname' => 'eb_get_site_data'),
-        array('externalserviceid' => $service_id, 'functionname' => 'eb_get_course_progress'),
+        array('externalserviceid' => $serviceid, 'functionname' => 'core_user_create_users'),
+        array('externalserviceid' => $serviceid, 'functionname' => 'core_user_get_users_by_field'),
+        array('externalserviceid' => $serviceid, 'functionname' => 'core_user_update_users'),
+        array('externalserviceid' => $serviceid, 'functionname' => 'core_course_get_courses'),
+        array('externalserviceid' => $serviceid, 'functionname' => 'core_course_get_categories'),
+        array('externalserviceid' => $serviceid, 'functionname' => 'enrol_manual_enrol_users'),
+        array('externalserviceid' => $serviceid, 'functionname' => 'enrol_manual_unenrol_users'),
+        array('externalserviceid' => $serviceid, 'functionname' => 'core_enrol_get_users_courses'),
+        array('externalserviceid' => $serviceid, 'functionname' => 'eb_test_connection'),
+        array('externalserviceid' => $serviceid, 'functionname' => 'eb_get_site_data'),
+        array('externalserviceid' => $serviceid, 'functionname' => 'eb_get_course_progress'),
         array('externalserviceid' => $serviceid, 'functionname' => 'eb_get_edwiser_plugins_info'),
     );
 
-
     $count = 0;
 
-
     foreach ($functions as $function) {
-        if (!$DB->record_exists('external_services_functions', array('functionname' => $function['functionname'], 'externalserviceid' => $service_id))) {
+        if (!$DB->record_exists(
+                'external_services_functions',
+                array('functionname' => $function['functionname'],
+                'externalserviceid' => $serviceid
+            ))
+        ) {
             $count ++;
         }
     }
 
-
-
-    //add extension functions if they are present
+    // Add extension functions if they are present.
     return $count;
 }
 
 
-
-function eb_get_summary_status()
-{
+/**
+ * Functionality to get summary status.
+ */
+function eb_get_summary_status() {
     global $CFG;
 
-    $settings_array = array(
+    $settingsarray = array(
         'enablewebservices'     => 1,
         'passwordpolicy'        => 0,
         'extendedusernamechars' => 1,
@@ -390,11 +391,11 @@ function eb_get_summary_status()
 
     );
 
-    foreach ($settings_array as $key => $value) {
-        if(isset($CFG->$key) && $value != $CFG->$key) {
+    foreach ($settingsarray as $key => $value) {
+        if (isset($CFG->$key) && $value != $CFG->$key) {
             if ($key == 'webserviceprotocols') {
-                $active_webservices = empty($CFG->webserviceprotocols) ? array() : explode(',', $CFG->webserviceprotocols);
-                if (!in_array('rest', $active_webservices)) {
+                $activewebservices = empty($CFG->webserviceprotocols) ? array() : explode(',', $CFG->webserviceprotocols);
+                if (!in_array('rest', $activewebservices)) {
                     return 'error';
                 }
             } else {
@@ -403,20 +404,16 @@ function eb_get_summary_status()
         }
     }
 
-    $service_array = array(
+    $servicearray = array(
         'ebexistingserviceselect',
         'edwiser_bridge_last_created_token'
     );
 
+    foreach ($servicearray as $value) {
 
-    foreach ($service_array as $value) {
-
-        if(empty($CFG->$value)) {
+        if (empty($CFG->$value)) {
             return 'warning';
         }
     }
-
     return 'sucess';
-
 }
-

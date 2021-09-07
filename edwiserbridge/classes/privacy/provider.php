@@ -29,10 +29,7 @@ use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\approved_userlist;
 use core_privacy\local\request\contextlist;
-use core_privacy\local\request\helper;
-use core_privacy\local\request\transform;
 use core_privacy\local\request\userlist;
-use core_privacy\local\request\writer;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -47,9 +44,6 @@ class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\core_userlist_provider,
     \core_privacy\local\request\plugin\provider{
-
-    /** The user preference for the navigation drawer. */
-    // const DRAWER_OPEN_NAV = 'drawer-open-nav';
 
     /**
      * Returns meta data about this system.
@@ -66,7 +60,7 @@ class provider implements
             'email'     => 'privacy:metadata:wp_site:email',
             'password'  => 'privacy:metadata:wp_site:password',
         ], 'privacy:metadata:wp_site');
- 
+
         return $collection;
     }
 

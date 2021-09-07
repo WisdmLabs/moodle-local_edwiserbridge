@@ -1,4 +1,4 @@
-require(['jquery', 'core/ajax', 'core/url'], function (jQuery, ajax, url) {
+require(['jquery', 'core/ajax', 'core/url'], function ($, ajax, url) {
     return {
         init: function ($params) {
             $(document).ready(function(){
@@ -111,6 +111,9 @@ require(['jquery', 'core/ajax', 'core/url'], function (jQuery, ajax, url) {
                         $('#id_course_un_enrollment').prop('checked', response.course_un_enrollment);
                         $('#id_user_creation').prop('checked', response.user_creation);
                         $('#id_user_deletion').prop('checked', response.user_deletion);
+                        $('#id_course_creation').prop('checked', response.course_creation);
+                        $('#id_course_deletion').prop('checked', response.course_deletion);
+                        $('#id_user_updation').prop('checked', response.user_updation);
                     }).fail(function(ex) {
                     });
                 });
