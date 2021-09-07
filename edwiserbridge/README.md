@@ -87,7 +87,7 @@ Please ensure that your hardware and software complies with 'Requirements' in 'I
 
 The Edwiser Bridge is 'free' software under the terms of the GNU GPLv3 License, please see 'LICENSE.md'.
 
-The primary source is on https://github.com/WisdmLabs/edwiser-bridge
+The primary source is on https://github.com/WisdmLabs/moodle-local_edwiserbridge/
 
 You have all the rights granted to you by the GPLv3 license.  If you are unsure about anything, then the
 FAQ - http://www.gnu.org/licenses/gpl-faq.html - is a good place to look.
