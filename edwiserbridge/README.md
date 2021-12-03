@@ -65,7 +65,6 @@ Refer to this documentation for setup: https://edwiser.org/documentation/edwiser
 * Secured and efficient transfer of information across sites,
 * Course Progress of student synced from Moodle to WordPress in real time.
 
-
 [(Back to top)](#table-of-contents)
 
 # Plugin Version
@@ -87,7 +86,7 @@ Please ensure that your hardware and software complies with 'Requirements' in 'I
 
 The Edwiser Bridge is 'free' software under the terms of the GNU GPLv3 License, please see 'LICENSE.md'.
 
-The primary source is on https://github.com/WisdmLabs/moodle-local_edwiserbridge/
+The primary source is on https://github.com/WisdmLabs/edwiser-bridge
 
 You have all the rights granted to you by the GPLv3 license.  If you are unsure about anything, then the
 FAQ - http://www.gnu.org/licenses/gpl-faq.html - is a good place to look.
@@ -135,7 +134,6 @@ Together we could make this solution better for your Moodle.
 1. Download the Moodle edwiserbridge plugin from <a href = "https://edwiser.org/wp-content/uploads/edd/2021/09/edwiserbridge.zip">here</a>.
 2. Now unzip and upload the folder in local directory of Moodle using the FTP application of your choice.
 3. The plugin can then be activated by navigating to the Plugins menu in the dashboard.
-
 
  = Moodle Configuration =
 Take a look at the link below and follow the steps provided to configure your Moodle website.
@@ -187,6 +185,6 @@ Wisdmlabs
 
 # Provided by
 
-[![alt text](https://raw.githubusercontent.com/WisdmLabs/moodle-format_remuiformat/master/images/readme-img.png)](https://edwiser.org)
+[![alt text](https://raw.githubusercontent.com/WisdmLabs/moodle-local_edwiserbridge/master/images/readme-img.png)](https://edwiser.org)
 
 [(Back to top)](#table-of-contents)

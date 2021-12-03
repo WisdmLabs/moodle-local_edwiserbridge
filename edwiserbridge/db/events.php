@@ -17,9 +17,10 @@
  * Edwiser Bridge - WordPress and Moodle integration.
  * File responsible to register all the events which are used for 2 way synch.
  *
- * @package local_edwiserbridge
- * @copyright  2016 Wisdmlabs
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_edwiserbridge
+ * @copyright   2021 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author      Wisdmlabs
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -30,27 +31,31 @@ $observers = array(
         'callback'  => 'local_edwiserbridge_observer::user_enrolment_created',
     ),
     array(
-       'eventname' => 'core\event\user_enrolment_deleted',
-       'callback'  => 'local_edwiserbridge_observer::user_enrolment_deleted',
+        'eventname' => 'core\event\user_enrolment_deleted',
+        'callback'  => 'local_edwiserbridge_observer::user_enrolment_deleted',
     ),
     array(
-       'eventname' => 'core\event\user_created',
-       'callback'  => 'local_edwiserbridge_observer::user_created',
+        'eventname' => 'core\event\user_created',
+        'callback'  => 'local_edwiserbridge_observer::user_created',
     ),
     array(
-       'eventname' => 'core\event\user_deleted',
-       'callback'  => 'local_edwiserbridge_observer::user_deleted',
+        'eventname' => 'core\event\user_deleted',
+        'callback'  => 'local_edwiserbridge_observer::user_deleted',
     ),
     array(
-       'eventname' => 'core\event\user_updated',
-       'callback'  => 'local_edwiserbridge_observer::user_updated',
+        'eventname' => 'core\event\user_updated',
+        'callback'  => 'local_edwiserbridge_observer::user_updated',
     ),
     array(
-      'eventname' => 'core\event\course_created',
-      'callback'  => 'local_edwiserbridge_observer::course_created',
+        'eventname' => 'core\event\user_password_updated',
+        'callback'  => 'local_edwiserbridge_observer::user_password_updated',
     ),
     array(
-       'eventname' => 'core\event\course_deleted',
-       'callback'  => 'local_edwiserbridge_observer::course_deleted',
+        'eventname' => 'core\event\course_created',
+        'callback'  => 'local_edwiserbridge_observer::course_created',
+    ),
+    array(
+        'eventname' => 'core\event\course_deleted',
+        'callback'  => 'local_edwiserbridge_observer::course_deleted',
     )
 );

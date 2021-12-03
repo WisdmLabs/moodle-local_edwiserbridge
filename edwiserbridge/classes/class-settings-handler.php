@@ -17,14 +17,22 @@
  * Edwiser Bridge - WordPress and Moodle integration.
  * File responsible to perform all actions of the set-up wizard.
  *
- * @package local_edwiserbridge
- * @copyright  2016 Wisdmlabs
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_edwiserbridge
+ * @copyright   2021 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author      Wisdmlabs
  */
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . "/externallib.php");
 
+/**
+ * Saves and handle all Moodle settings related functionalities.
+ *
+ * @package     local_edwiserbridge
+ * @copyright   2021 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class eb_settings_handler {
 
     /**
@@ -109,7 +117,7 @@ class eb_settings_handler {
         $shortname = 'edwiser';
         $numtries  = 0;
         do {
-            $numtries ++;
+            $numtries++;
             $newshortname = $shortname . $numtries;
             if ($numtries > 100) {
                 return 0;
@@ -119,7 +127,6 @@ class eb_settings_handler {
 
         return $newshortname;
     }
-
 
     /**
      * checked if the provided service name is already regisered.
@@ -149,7 +156,6 @@ class eb_settings_handler {
         $dbarr['timecreated'] = time();
         $DB->insert_record('external_services_users', $dbarr);
     }
-
 
     /**
      * This function adds default web services which registered with the edwiser-bridge only
@@ -218,7 +224,6 @@ class eb_settings_handler {
         }
     }
 
-
     /**
      * This links the existing web service i.e it adds all the missing functions top the web-service
      * This does not add ayuth user.
@@ -234,7 +239,6 @@ class eb_settings_handler {
 
         return 1;
     }
-
 
     /**
      * This function creates the token by calling Moodles inbuilt function

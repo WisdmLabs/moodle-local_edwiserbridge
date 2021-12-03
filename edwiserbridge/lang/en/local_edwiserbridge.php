@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Privacy Subsystem implementation for local_edwiserbridge.
+ * Strings required for plugin.
  *
- * @package   local_edwiserbridge
- * @copyright 2018 Andrew Nicols <andrew@nicols.co.uk>
- * @copyright (c) 2020 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_edwiserbridge
+ * @copyright   2021 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author      Wisdmlabs
  */
 
 defined('MOODLE_INTERNAL') || die();
@@ -49,7 +49,6 @@ $string['lang_label'] = 'Language Code';
 $string["wp_site_settings_title"] = "Site Settings :";
 $string["nav_name"] = "Settings";
 $string["default_settings_nav"] = "Settings";
-
 
 $string["edwiserbridge"] = "Edwiser Bridge";
 $string["eb-setting-page-title"] = "Edwiser Bridge Two Way Synchronization Settings";
@@ -170,7 +169,6 @@ $string["web_service_course_creation"] = "Checks if Edwiser Bridge 2 way sync co
 $string["web_service_course_deletion"] = "Checks if Edwiser Bridge 2 way sync course deletion is enabled.";
 $string["web_service_user_update"] = "Checks if Edwiser Bridge 2 way sync user update is enabled.";
 
-
 $string["web_service_offset"] = "This is the offset for the select query.";
 $string["web_service_limit"] = "This limits the number of users returned.";
 $string["web_service_search_string"] = "This string will be searched in the select query.";
@@ -235,12 +233,11 @@ $string['enabled'] = 'Enabled';
 $string['disabled'] = 'Disabled';
 
 $string['mdl_url'] = 'Moodle URL';
-$string['wp_test_connection_failed'] = 'or Wordpress permalink is not postname. Also, check if you have any firewall or security plugin, If yes  Whitelist Moodle URL and IP. If this does not fix then connect with your Hosting providers.';
+$string['wp_test_connection_failed'] = 'Server rewrite rules are not enabled or Wordpress permalink is not postname. Also, check if you have any firewall or security plugin, If yes  Whitelist Moodle URL and IP. If this does not fix then connect with your Hosting providers.';
 /**************/
 
 /*****************************  ADDED FOR SETTINGS PAGE   *****************************/
 $string["manual_notification"] = "MANUAL NOTIFICATION";
-
 
 /*********  Form error Handling.    *******/
 $string['service_name_empty'] = 'Please enter web service name';
@@ -249,7 +246,6 @@ $string['token_empty'] = 'Please select Token';
 
 $string['web_service_creation_status'] = 'Web service creation status';
 $string['web_service_creation_msg'] = 'Web service creation message';
-
 
 /*
  * GDPR compatibility strings.

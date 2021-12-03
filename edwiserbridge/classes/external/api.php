@@ -13,11 +13,8 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 /**
- * Plugin version file.
- *
- * Edwiser Bridge - WordPress and Moodle integration.
+ * Provides local_edwiserbridge\external\api class.
  *
  * @package     local_edwiserbridge
  * @copyright   2021 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
@@ -25,10 +22,27 @@
  * @author      Wisdmlabs
  */
 
+namespace local_edwiserbridge\external;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2021120100;    // The current plugin version (Date: YYYYMMDDXX).
-$plugin->release   = '2.1.3';
-$plugin->requires  = '2016052318'; // Requires this Moodle version (Moodle V3.1.0).
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->component = 'local_edwiserbridge'; // Full name of the plugin (used for diagnostics).
+require_once($CFG->libdir . '/externallib.php');
+
+use external_api;
+
+/**
+ * Provides an external API of the block.
+ *
+ * Each external function is implemented in its own trait. This class
+ * aggregates them all.
+ */
+class api extends external_api {
+    use eb_create_service;
+    use eb_get_course_progress;
+    use eb_get_edwiser_plugins_info;
+    use eb_get_service_info;
+    use eb_get_site_data;
+    use eb_get_users;
+    use eb_link_service;
+    use eb_test_connection;
+}
