@@ -1,7 +1,29 @@
-define(['jquery', 'core/ajax', 'core/url', 'core/str'], function ($, ajax, url) {
+// This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+/**
+ * JS file to handle edwiser bridge.
+ *
+ * @package     local_edwiserbridge
+ * @copyright   2021 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author      Wisdmlabs
+ */
+define(['jquery', 'core/ajax', 'core/url', 'core/str'], function($, ajax, url) {
     return {
-        init: function ($params) {
-            $(document).ready(function(){
+        init: function($params) {
+            $(document).ready(function() {
 
                 /**
                  * functionality to avoid space in the site name
@@ -20,9 +42,9 @@ define(['jquery', 'core/ajax', 'core/url', 'core/str'], function ($, ajax, url) 
                 /**
                  * functionality to test connection
                  */
-                $("[id$=_eb_test_connection]").click(function(event){
+                $("[id$=_eb_test_connection]").click(function(event) {
                     event.preventDefault();
-                    $(document.body).css({'cursor' : 'wait'});
+                    $(document.body).css({ 'cursor': 'wait' });
                     var id = $(this).prop("id");
                     id = id.replace("eb_test_connection", '');
                     id = id.replace("id_eb_buttons", '');
@@ -36,7 +58,7 @@ define(['jquery', 'core/ajax', 'core/url', 'core/str'], function ($, ajax, url) 
                     parent.find("#eb_test_conne_response").css("display", "none");
 
                     var promises = ajax.call([
-                        {methodname: 'eb_test_connection', args: {wp_url: url, wp_token: token}}
+                        { methodname: 'eb_test_connection', args: { wp_url: url, wp_token: token } }
                     ]);
 
                     promises[0].done(function(response) {
@@ -50,10 +72,10 @@ define(['jquery', 'core/ajax', 'core/url', 'core/str'], function ($, ajax, url) 
                             parent.find("#eb_test_conne_response").removeClass("eb-success-msg");
                             parent.find("#eb_test_conne_response").addClass("eb-error-msg");
                         }
-                        $(document.body).css({'cursor' : 'default'});
+                        $(document.body).css({ 'cursor': 'default' });
                     }).fail(function(ex) {
-                       // do something with the exception
-                       $(document.body).css({'cursor' : 'default'});
+                        // do something with the exception
+                        $(document.body).css({ 'cursor': 'default' });
                     });
                 });
 
@@ -62,7 +84,7 @@ define(['jquery', 'core/ajax', 'core/url', 'core/str'], function ($, ajax, url) 
                 /**
                  * functionality to remove site from the sites list
                  */
-                $("[id$=_eb_remove_site]").click(function(event){
+                $("[id$=_eb_remove_site]").click(function(event) {
                     event.preventDefault();
                     var id = $(this).prop("id");
                     id = id.replace("eb_remove_site", '');
@@ -75,13 +97,12 @@ define(['jquery', 'core/ajax', 'core/url', 'core/str'], function ($, ajax, url) 
 
                     //Hiding elemnts
                     onRemoveHideElemnts(index);
-                    $("input[name='wp_remove["+ index +"]']").val("yes");
+                    $("input[name='wp_remove[" + index + "]']").val("yes");
                 });
 
 
                 //Hide the elements removed from the remove button.
-                function onRemoveHideElemnts(index)
-                {
+                function onRemoveHideElemnts(index) {
                     $("#id_wp_name_" + index).closest('fieldset').css("display", "none");
                 }
 
@@ -90,7 +111,7 @@ define(['jquery', 'core/ajax', 'core/url', 'core/str'], function ($, ajax, url) 
                 if ($("input[name='wp_remove[0]']").length) {
                     var repeatQty = $("input[name='eb_connection_setting_repeats']").val();
                     for (var i = 0; i < repeatQty; i++) {
-                        if ("yes" == $("input[name='wp_remove["+ i +"]']").val()) {
+                        if ("yes" == $("input[name='wp_remove[" + i + "]']").val()) {
                             onRemoveHideElemnts(i);
                         }
                         // $("input[name='wp_remove["+ i +"]']").val("no");
@@ -101,9 +122,9 @@ define(['jquery', 'core/ajax', 'core/url', 'core/str'], function ($, ajax, url) 
                 /**
                  * functionlaity to get site synch values on the site change
                  */
-                $("#id_wp_site_list").on("change", function(){
+                $("#id_wp_site_list").on("change", function() {
                     var promises = ajax.call([
-                        {methodname: 'eb_get_site_data', args: {site_index: $(this).val()}}
+                        { methodname: 'eb_get_site_data', args: { site_index: $(this).val() } }
                     ]);
 
                     promises[0].done(function(response) {
@@ -114,8 +135,7 @@ define(['jquery', 'core/ajax', 'core/url', 'core/str'], function ($, ajax, url) 
                         $('#id_course_creation').prop('checked', response.course_creation);
                         $('#id_course_deletion').prop('checked', response.course_deletion);
                         $('#id_user_updation').prop('checked', response.user_updation);
-                    }).fail(function(ex) {
-                    });
+                    }).fail(function(ex) {});
                 });
             });
         }

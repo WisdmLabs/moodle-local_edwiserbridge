@@ -17,24 +17,36 @@
  * Edwiser Bridge - WordPress and Moodle integration.
  * This file is responsible for WordPress connection related functionality.
  *
- * @package local_edwiserbridge
- * @copyright  2016 Wisdmlabs
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_edwiserbridge
+ * @copyright   2021 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author      Wisdmlabs
  */
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * Handles API requests and response from WordPress.
+ *
+ * @package     local_edwiserbridge
+ * @copyright   2021 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class api_handler {
-    // Returns instance of the class if already created.
+
+    /** @var int  Returns instance of the class if already created */
     protected static $instance = null;
 
-    // Creates insce of the class.
+    /**
+     * Creates insce of the class.
+     *
+     * @return object self object.
+     */
     public static function instance() {
         if (is_null(self::$instance)) {
             self::$instance = new self();
         }
         return self::$instance;
     }
-
 
     /**
      * Create external service with the provided name and the user id
@@ -47,21 +59,29 @@ class api_handler {
         $requesturl .= '/wp-json/edwiser-bridge/wisdmlabs/';
 
         $curl = curl_init();
-        curl_setopt_array($curl, array(
-            CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_URL            => $requesturl,
-            CURLOPT_TIMEOUT        => 100
-        ));
+        curl_setopt_array(
+            $curl,
+            array(
+                CURLOPT_RETURNTRANSFER => 1,
+                CURLOPT_URL            => $requesturl,
+                CURLOPT_TIMEOUT        => 100
+            )
+        );
 
         curl_setopt($curl, CURLOPT_POST, 1);
+
+        curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.2; WOW64; rv:17.0) Gecko/20100101 Firefox/17.0');
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0); // Skip SSL Verification.
+
         curl_setopt($curl, CURLOPT_POSTFIELDS, $requestdata);
         $response = curl_exec($curl);
+
         $statuscode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         if (curl_error($curl)) {
             $errormsg = curl_error($curl);
             curl_close($curl);
-            return array("error" => 1, "msg" => $errormsg );
+            return array("error" => 1, "msg" => $errormsg);
         } else {
             curl_close($curl);
 

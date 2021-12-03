@@ -14,30 +14,26 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 /**
- * Edwiser Bridge - WordPress and Moodle integration.
- * File contains all required
+ * File contains all required lib functions.
  *
- * @package local_edwiserbridge
- * @copyright  2016 Wisdmlabs
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_edwiserbridge
+ * @copyright   2021 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author      Wisdmlabs
  */
 defined('MOODLE_INTERNAL') || die();
 
-require_once(dirname(__FILE__)."/classes/class-api-handler.php");
-require_once(dirname(__FILE__)."/classes/class-settings-handler.php");
+require_once(dirname(__FILE__) . "/classes/class-api-handler.php");
+require_once(dirname(__FILE__) . "/classes/class-settings-handler.php");
 require_once("{$CFG->libdir}/completionlib.php");
 
-
-function local_edwiserbridge_extend_settings_navigation($settingsnav, $context) {
-
-}
-
-
 /**
- * [save_connection_form_settings description]
+ * Saving test connection form data.
+ * Saves forntend form data with all the available data like multiple WP site and token.
  * @param object $formdata formdata
  */
 function save_connection_form_settings($formdata) {
+    // Checking if provided data count is correct or not.
     if (count($formdata->wp_url) != count($formdata->wp_token)) {
         return;
     }
@@ -57,6 +53,8 @@ function save_connection_form_settings($formdata) {
 
 /**
  * Save the synch settings for the individual site
+ *
+ * @param object $formdata formdata
  */
 function save_synchronization_form_settings($formdata) {
     global $CFG;
@@ -77,13 +75,15 @@ function save_synchronization_form_settings($formdata) {
             "course_deletion"      => $formdata->course_deletion,
             "user_updation"        => $formdata->user_updation
         );
-
     }
     set_config("eb_synch_settings", serialize($synchsettings));
 }
 
-
-
+/**
+ * Save the general settings for Moodle.
+ *
+ * @param object $formdata formdata
+ */
 function save_settings_form_settings($formdata) {
     global $CFG;
 
@@ -102,13 +102,12 @@ function save_settings_form_settings($formdata) {
         set_config("enablewebservices", $formdata->web_service);
         set_config("extendedusernamechars", $formdata->extended_username);
         set_config("passwordpolicy", $formdata->pass_policy);
-
     }
-
 }
 
-
-
+/**
+ * Get required settings fromm DB.
+ */
 function get_required_settings() {
     global $CFG;
 
@@ -128,10 +127,8 @@ function get_required_settings() {
     return $requiredsettings;
 }
 
-
-
 /**
- * returns connection settings saved in the settings form.
+ * Returns connection settings saved in the settings form.
  */
 function get_connection_settings() {
     global $CFG;
@@ -139,11 +136,10 @@ function get_connection_settings() {
     return $reponse;
 }
 
-
 /**
- * returns individual sites data.
- * @param  [type] $index [description]
- * @return [type]        [description]
+ * Returns individual sites data.
+ * @param  int $index [description]
+ * @return array returns selected sites data.
  */
 function get_synch_settings($index) {
     global $CFG;
@@ -166,9 +162,8 @@ function get_synch_settings($index) {
     return $data;
 }
 
-
 /**
- * returns all the sites created in the edwiser settings.
+ * Returns all the sites created in the edwiser settings.
  * @return array sites list
  */
 function get_site_list() {
@@ -185,8 +180,6 @@ function get_site_list() {
     return $sites;
 }
 
-
-
 /**
  * Returns the main instance of EDW to prevent the need to use globals.
  *
@@ -198,11 +191,10 @@ function api_handler_instance() {
     return api_handler::instance();
 }
 
-
 /**
  * returns the list of courses in which user is enrolled
  *
- * @return int $userid user id.
+ * @param int $userid user id.
  * @return array array of courses.
  */
 function get_array_of_enrolled_courses($userid) {
@@ -234,12 +226,14 @@ function remove_processed_coures($courseid, $courses) {
  * Functionality to check if the request is from wordpress and the stop processing the enrollment and unenrollment.
  */
 function check_if_request_is_from_wp() {
-    if (isset($_POST) && isset($_POST["enrolments"])) {
-        return 1;
-    }
-    return 0;
-}
+    $required    = 0;
+    $enrollments = optional_param('enrolments', 0, PARAM_INT);
 
+    if ($enrollments && !empty($enrollments)) {
+        $required = 1;
+    }
+    return $required;
+}
 
 /*-----------------------------------------------------------
  *   Functions used in Settings page
@@ -308,7 +302,7 @@ function eb_create_token_field($serviceid, $existingtoken = '') {
     $html = '<div class="eb_copy_txt_wrap">
                 <div style="width:60%;">
                     <select class="eb_copy" class="custom-select" name="eb_token" id="id_eb_token">
-                    <option value="">'. get_string('token_dropdown_lbl', 'local_edwiserbridge') .'</option>';
+                    <option value="">' . get_string('token_dropdown_lbl', 'local_edwiserbridge') . '</option>';
 
     foreach ($tokenslist as $token) {
         $selected = '';
@@ -322,19 +316,18 @@ function eb_create_token_field($serviceid, $existingtoken = '') {
             $display = 'style="display:none"';
         }
 
-        $html .= '<option data-id="'. $token['id'] .'" value="'. $token['token'] .'" '
-        . $display ." " . $selected.'>'. $token['token'] .'</option>';
+        $html .= '<option data-id="' . $token['id'] . '" value="' . $token['token'] . '" '
+            . $display . " " . $selected . '>' . $token['token'] . '</option>';
     }
 
     $html .= '      </select>
                 </div>
-                <div> <button class="btn btn-primary eb_primary_copy_btn">'. get_string('copy', 'local_edwiserbridge')
-                .'</button> </div>
+                <div> <button class="btn btn-primary eb_primary_copy_btn">' . get_string('copy', 'local_edwiserbridge')
+        . '</button> </div>
             </div>';
 
     return $html;
 }
-
 
 /**
  * Functionality to get count of not available services which are required for Edwiser-Bridge.
@@ -342,7 +335,7 @@ function eb_create_token_field($serviceid, $existingtoken = '') {
  * @param int $serviceid service id.
  * @return string count of not available services.
  */
-function eb_get_service_info($serviceid) {
+function eb_get_service_list($serviceid) {
     global $DB;
     $functions = array(
         array('externalserviceid' => $serviceid, 'functionname' => 'core_user_create_users'),
@@ -363,19 +356,19 @@ function eb_get_service_info($serviceid) {
 
     foreach ($functions as $function) {
         if (!$DB->record_exists(
-                'external_services_functions',
-                array('functionname' => $function['functionname'],
+            'external_services_functions',
+            array(
+                'functionname' => $function['functionname'],
                 'externalserviceid' => $serviceid
-            ))
-        ) {
-            $count ++;
+            )
+        )) {
+            $count++;
         }
     }
 
     // Add extension functions if they are present.
     return $count;
 }
-
 
 /**
  * Functionality to get summary status.

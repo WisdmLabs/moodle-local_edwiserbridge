@@ -17,22 +17,21 @@
  * Edwiser Bridge - WordPress and Moodle integration.
  * File displays the edwiser bridge settings.
  *
- * @package local_edwiserbridge
- * @copyright  2016 Wisdmlabs
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_edwiserbridge
+ * @copyright   2021 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author      Wisdmlabs
  */
 
-require( '../../config.php' );
-require_once( $CFG->libdir.'/adminlib.php' );
+require('../../config.php');
+require_once($CFG->libdir . '/adminlib.php');
 require_once('mod_form.php');
-
 
 global $CFG, $COURSE, $PAGE;
 
 $PAGE->requires->jquery();
 $PAGE->requires->jquery_plugin('ui');
 $PAGE->requires->jquery_plugin('ui-css');
-
 
 // Restrict normal user to access this page.
 admin_externalpage_setup('edwiserbridge_conn_synch_settings');
@@ -41,41 +40,33 @@ $stringmanager = get_string_manager();
 $strings = $stringmanager->load_component_strings('local_edwiserbridge', 'en');
 $PAGE->requires->strings_for_js(array_keys($strings), 'local_edwiserbridge');
 
-
 // Require Login.
 require_login();
 $context = context_system::instance();
-$baseurl = $CFG->wwwroot.'/local/edwiserbridge/edwiserbridge.php?tab=connection';
+$baseurl = $CFG->wwwroot . '/local/edwiserbridge/edwiserbridge.php?tab=connection';
 
 /*
 * Creating array of the objects which will be created.
 */
 $mform = array(
-    'service' => array
-    (
+    'service' => array(
         'id'  => 'eb_service_form'
     ),
-    'connection' => array
-    (
+    'connection' => array(
         'id'  => 'eb_connection_form'
     ),
-    'synchronization' => array
-    (
+    'synchronization' => array(
         'id'  => 'eb_synch_form'
     ),
-    'settings' => array
-    (
+    'settings' => array(
         'id'  => 'eb_settings_form'
     ),
-    'summary' => array
-    (
+    'summary' => array(
         'id'  => 'eb_summary_form'
     )
-
 );
 
 $mformnavigation = new edwiserbridge_navigation_form();
-
 
 /*
  * Necessary page requirements.
@@ -91,7 +82,6 @@ $PAGE->requires->js_call_amd("local_edwiserbridge/edwiser_bridge", "init");
 echo $OUTPUT->header();
 echo $OUTPUT->container_start();
 
-
 /*
  * Navigation form
  */
@@ -100,7 +90,7 @@ $mformnavigation->display();
 /*
 * Functionality to display tab wise forms
 */
-$pageurl = $CFG->wwwroot.'/local/edwiserbridge/edwiserbridge.php?tab=';
+$pageurl = $CFG->wwwroot . '/local/edwiserbridge/edwiserbridge.php?tab=';
 foreach ($mform as $key => $mformdata) {
     // Create object.
     $objectname = 'edwiserbridge_' . $key . '_form';
@@ -110,15 +100,17 @@ foreach ($mform as $key => $mformdata) {
         // In this case you process validated data. $mform->get_data() returns data posted in form.
 
         // Calling the save function for each tabn if present.
-        $functionname = 'save_'. $key .'_form_settings';
+        $functionname = 'save_' . $key . '_form_settings';
 
         if (function_exists($functionname)) {
             $functionname($formdata);
         }
     }
 
-        // Display connection form  for the first time.
-    if (isset($_GET["tab"]) && $_GET["tab"] == $key) {
+    $tab = optional_param('tab', '', PARAM_TEXT);
+
+    // Display connection form  for the first time.
+    if ($tab == $key) {
         $object->display();
     }
 }

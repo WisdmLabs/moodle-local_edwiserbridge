@@ -31,3 +31,7 @@ Tweak
 Version 2.1.2
 Tweak
 * Made plugin compatible with the Moodle Coding standards.
+
+Version 2.1.3
+Feature
+* Added functionality to update password through user preference option.

@@ -17,22 +17,29 @@
  * Edwiser Bridge - WordPress and Moodle integration.
  * Observer file used as the callback for all the events.
  *
- * @package local_edwiserbridge
- * @copyright  2016 Wisdmlabs
- * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package     local_edwiserbridge
+ * @copyright   2021 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author      Wisdmlabs
  */
 
 defined('MOODLE_INTERNAL') || die();
-require_once($CFG->dirroot.'/local/edwiserbridge/lib.php');
-require_once($CFG->dirroot.'/user/lib.php');
+require_once($CFG->dirroot . '/local/edwiserbridge/lib.php');
+require_once($CFG->dirroot . '/user/lib.php');
 
-
+/**
+ * Handles callbacks for all in built Moodle events.
+ *
+ * @package     local_edwiserbridge
+ * @copyright   2021 WisdmLabs (https://wisdmlabs.com/) <support@wisdmlabs.com>
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class local_edwiserbridge_observer {
 
     /**
      * Functionality to handle user enrollment event.
      *
-     * @param  object event.
+     * @param core\event\user_enrolment_created $event event.
      */
     public static function user_enrolment_created(core\event\user_enrolment_created $event) {
         global $CFG;
@@ -67,11 +74,10 @@ class local_edwiserbridge_observer {
         }
     }
 
-
     /**
      * Functionality to handle user un enrollment event.
      *
-     * @param  object event.
+     * @param core\event\user_enrolment_deleted $event event.
      */
     public static function user_enrolment_deleted(core\event\user_enrolment_deleted $event) {
         global $CFG;
@@ -106,11 +112,10 @@ class local_edwiserbridge_observer {
         }
     }
 
-
     /**
      * Functionality to handle user creation event.
      *
-     * @param  object event.
+     * @param core\event\user_created $event event.
      */
     public static function user_created(core\event\user_created $event) {
 
@@ -129,13 +134,16 @@ class local_edwiserbridge_observer {
 
             foreach ($sites as $value) {
                 if ($synchconditions[$value["wp_name"]]["user_creation"] && $value['wp_token']) {
-                    $password = '';
-                    $enciv   = '';
+                    $password    = '';
+                    $enciv       = '';
+                    $newpassword = optional_param('newpassword', '', PARAM_TEXT);
+
                     // If new password in not empty.
-                    if (isset($_POST['newpassword']) && $_POST['newpassword']) {
+                    if ($newpassword && !empty($newpassword)) {
+                        // if (isset($_POST['newpassword']) && $_POST['newpassword']) {
                         $enckey   = openssl_digest($value["wp_token"], 'SHA256', true);
-                        $enciv = substr(hash('sha256', $value["wp_token"]), 0, 16);
-                        $password = openssl_encrypt($_POST['newpassword'], $encmethod, $enckey, 0, $enciv);
+                        $enciv    = substr(hash('sha256', $value["wp_token"]), 0, 16);
+                        $password = openssl_encrypt($newpassword, $encmethod, $enckey, 0, $enciv);
                     }
 
                     $requestdata = array(
@@ -154,13 +162,12 @@ class local_edwiserbridge_observer {
                 }
             }
         }
-
     }
 
     /**
      * Functionality to handle user update event.
      *
-     * @param  object event.
+     * @param core\event\user_updated $event event.
      */
     public static function user_updated(core\event\user_updated $event) {
         global $CFG;
@@ -173,22 +180,26 @@ class local_edwiserbridge_observer {
 
         $apihandler = api_handler_instance();
         if (isset($CFG->eb_connection_settings)) {
+
             $sites = unserialize($CFG->eb_connection_settings);
             $synchconditions = unserialize($CFG->eb_synch_settings);
 
             foreach ($sites as $value) {
-                if (isset($synchconditions[$value["wp_name"]]["user_updation"]) &&
-                $synchconditions[$value["wp_name"]]["user_updation"] &&
-                $value['wp_token']
+                if (
+                    isset($synchconditions[$value["wp_name"]]["user_updation"]) &&
+                    $synchconditions[$value["wp_name"]]["user_updation"] &&
+                    $value['wp_token']
                 ) {
-                    $password = '';
-                    $enciv   = '';
+                    $password    = '';
+                    $enciv       = '';
+                    $newpassword = optional_param('newpassword', '', PARAM_TEXT);
 
                     // If new password in not empty.
-                    if (isset($_POST['newpassword']) && $_POST['newpassword']) {
+                    if ($newpassword && !empty($newpassword)) {
+                        // if (isset($_POST['newpassword']) && $_POST['newpassword']) {
                         $enckey   = openssl_digest($value["wp_token"], 'SHA256', true);
                         $enciv = substr(hash('sha256', $value["wp_token"]), 0, 16);
-                        $password = openssl_encrypt($_POST['newpassword'], $encmethod, $enckey, 0, $enciv);
+                        $password = openssl_encrypt($newpassword, $encmethod, $enckey, 0, $enciv);
                     }
 
                     $requestdata = array(
@@ -212,9 +223,63 @@ class local_edwiserbridge_observer {
     }
 
     /**
+     * Functionality to handle user update event.
+     *
+     * @param core\event\user_password_updated $event event.
+     */
+    public static function user_password_updated(core\event\user_password_updated $event) {
+        global $CFG;
+
+        $userdata = user_get_users_by_id(array($event->userid));
+
+        // User password should be encrypted. Using Openssl for it.
+        // We will use token as the key as it is present on both sites.
+        // Open SSL encryption initialization.
+        $encmethod = 'AES-128-CTR';
+        $apihandler  = api_handler_instance();
+        if (isset($CFG->eb_connection_settings)) {
+
+            $sites = unserialize($CFG->eb_connection_settings);
+            $synchconditions = unserialize($CFG->eb_synch_settings);
+
+            foreach ($sites as $value) {
+                if (
+                    isset($synchconditions[$value["wp_name"]]["user_updation"]) &&
+                    $synchconditions[$value["wp_name"]]["user_updation"] &&
+                    $value['wp_token']
+                ) {
+
+                    $password    = '';
+                    $enciv       = '';
+                    $newpassword = optional_param('newpassword1', '', PARAM_TEXT);
+
+                    // If new password in not empty.
+                    if ($newpassword && !empty($newpassword)) {
+                        // if (isset($_POST['newpassword1']) && $_POST['newpassword1']) {
+                        $enckey   = openssl_digest($value["wp_token"], 'SHA256', true);
+                        $enciv    = substr(hash('sha256', $value["wp_token"]), 0, 16);
+                        $password = openssl_encrypt($newpassword, $encmethod, $enckey, 0, $enciv);
+                    }
+
+                    $requestdata = array(
+                        'action'     => 'user_updated',
+                        'user_id'    => $event->userid,
+                        'email'      => $userdata[$event->userid]->email,
+                        'password'   => $password,
+                        'enc_iv'     => $enciv,
+                        'secret_key' => $value['wp_token'], // Adding Token for verification in WP from Moodle.
+                    );
+
+                    $apihandler->connect_to_wp_with_args($value["wp_url"], $requestdata);
+                }
+            }
+        }
+    }
+
+    /**
      * Functionality to handle user deletion event.
      *
-     * @param  object event.
+     * @param core\event\user_deleted $event event.
      */
     public static function user_deleted(core\event\user_deleted $event) {
         global $CFG;
@@ -242,7 +307,7 @@ class local_edwiserbridge_observer {
     /**
      * Functionality to handle Course deletion event.
      *
-     * @param  object event.
+     * @param core\event\course_created $event event.
      */
     public static function course_created(core\event\course_created $event) {
         global $CFG;
@@ -255,9 +320,10 @@ class local_edwiserbridge_observer {
             $synchconditions = unserialize($CFG->eb_synch_settings);
 
             foreach ($sites as $value) {
-                if (isset($synchconditions[$value["wp_name"]]["course_creation"]) &&
-                $synchconditions[$value["wp_name"]]["course_creation"] &&
-                $value['wp_token']
+                if (
+                    isset($synchconditions[$value["wp_name"]]["course_creation"]) &&
+                    $synchconditions[$value["wp_name"]]["course_creation"] &&
+                    $value['wp_token']
                 ) {
                     $requestdata = array(
                         'action'      => 'course_created',
@@ -269,18 +335,15 @@ class local_edwiserbridge_observer {
                     );
 
                     $apihandler->connect_to_wp_with_args($value["wp_url"], $requestdata);
-
                 }
             }
         }
-
     }
-
 
     /**
      * Functionality to handle Course deletion event.
      *
-     * @param  object event.
+     * @param core\event\course_deleted $event event.
      */
     public static function course_deleted(core\event\course_deleted $event) {
         global $CFG;
@@ -296,9 +359,10 @@ class local_edwiserbridge_observer {
             $synchconditions = unserialize($CFG->eb_synch_settings);
 
             foreach ($sites as $value) {
-                if (isset($synchconditions[$value["wp_name"]]["course_deletion"]) &&
-                $synchconditions[$value["wp_name"]]["course_deletion"] &&
-                $value['wp_token']
+                if (
+                    isset($synchconditions[$value["wp_name"]]["course_deletion"]) &&
+                    $synchconditions[$value["wp_name"]]["course_deletion"] &&
+                    $value['wp_token']
                 ) {
                     // Adding Token for verification in WP from Moodle.
                     $requestdata['secret_key'] = $value['wp_token'];

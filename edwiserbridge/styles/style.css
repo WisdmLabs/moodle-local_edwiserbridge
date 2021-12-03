@@ -14,6 +14,7 @@
     padding: 30px;
 }
 
+
 /*#admin-ebnewserviceinp, #admin-ebnewserviceuserselect, #eb_service_form .eb_service_field{
     display: none;
 }
@@ -54,6 +55,7 @@
     font-weight: 600;
     opacity: 1;
 }
+
 .eb-error-msg {
     padding-bottom: 30px;
 }
@@ -111,7 +113,6 @@
     border-radius: 4px;
 }
 
-
 #admin-eb_setup_wizard_field {
     display: none;
 }
@@ -119,7 +120,6 @@
 .eb_copy_txt_wrap {
     display: flex;
 }
-
 
 .eb_copy_div div:first-child {
     border: 1px solid #cecece;
@@ -143,9 +143,12 @@
     padding: 6px 10px;
 }
 
+
 /***********  POP UP CSS   **************/
 
+
 /* Popup box BEGIN */
+
 .eb_service_pop_up {
     cursor: pointer;
     display: none;
@@ -159,12 +162,14 @@
     padding-top: 100px;
     left: 30%;
 }
+
 .eb_service_pop_up .helper {
     display: inline-block;
     height: 100%;
     vertical-align: middle;
 }
-.eb_service_pop_up > div {
+
+.eb_service_pop_up>div {
     background-color: #fff;
     box-shadow: 10px 10px 60px #555;
     display: inline-block;
@@ -177,6 +182,7 @@
     border-radius: 8px;
     padding: 30px 30px;
 }
+
 .eb_service_pop_up_close {
     background-color: #fff;
     cursor: pointer;
@@ -197,7 +203,9 @@
     background-color: #ccc;
 }
 
+
 /*********** END **************/
+
 
 /*********  Summary Page issue  *********/
 
@@ -237,9 +245,13 @@
     color: red;
 }
 
+.eb_summary_tab {
+    flex-grow: 1;
+}
+
 .summary_tab_sucess {
     cursor: pointer;
-    /* padding: 15px; */
+    padding: 10px;
     color: white;
     background-color: green;
     opacity: 0.8;
@@ -258,6 +270,7 @@
 
 .summary_tab_sucess:hover {
     background-color: #045904;
+    color: white;
 }
 
 .summary_tab_warning:hover {
@@ -267,5 +280,6 @@
 .summary_tab_error:hover {
     background-color: #bc0505;
 }
+
 
 /*****************/
